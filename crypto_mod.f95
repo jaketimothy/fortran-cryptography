@@ -1,9 +1,12 @@
 ! Notes:
 ! No, fortran does not support unsigned integers.
 
-module crypto_mod
+module crypto
     use, intrinsic :: iso_fortran_env
     implicit none
+    private
+    
+    public :: SHA1
     
 contains
     function SHA1(string)
@@ -12,7 +15,7 @@ contains
         integer(int32) :: h0, h1, h2, h3, h4, w(80), a, b, c, d, e, f, k, temp
         integer(int64) :: sl
         integer(int8), dimension(:), allocatable :: ipadded
-        integer :: i, j, n, l
+        integer :: i, j
         
         sl = len_trim(string)
         
@@ -29,8 +32,8 @@ contains
         h4 = -1009589776_int32 ! z'C3D2E1F0'
         
         do i = 1,size(ipadded)/64
-            do j = 1,16
-                w(j) = transfer(ipadded((i-1)*64 + j*4:(i-1)*64 + (j-1)*4 + 1:-1), w(j)) ! take 512 bit chunk of string
+            do j = 1,16 ! take 512 bit chunk of string
+                w(j) = transfer(ipadded((i-1)*64 + j*4:(i-1)*64 + (j-1)*4 + 1:-1), w(j)) ! is the source size less than the result size?
             end do
             do j = 17,80 ! Extend the sixteen 32-bit words into eighty 32-bit words
                 w(j) = ishftc(ieor(ieor(ieor(w(j-3), w(j-8)), w(j-14)), w(j-16)), 1)
@@ -96,4 +99,4 @@ contains
         
         bytearray_reverse = a(size(a):1:-1)
     end function bytearray_reverse
-end module crypto_mod
+end module crypto
