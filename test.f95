@@ -1,31 +1,23 @@
 program datastructures
-    use hashtable_mod
+    use, intrinsic :: iso_fortran_env
+    use crypto
     implicit none
     
-    integer :: i
-    type(hashtable), target :: mytable
-    character(len=32), target :: key, outval
-    integer :: value
+    character(len=*), parameter :: val1 = "message"
+    character(len=*), parameter :: val2 = ""
+    character(len=8) :: inval = "FFFF8001"
+    integer(int32) :: itest
     
-    do i = 1,12
-        write(key, '(i2)') i
-        call mytable%put(key, i)
-    end do
-    call mytable%get(key, value)
-    print *, 'value', value
-    do i = 13,32
-        write(key, '(i2)') i
-        call mytable%put(key, i)
-    end do
-    call mytable%put('me', 'jake')
-    call mytable%put('jakesemail', 'xxx@xxx.com')
+    read(inval, "(Z8)") itest
+    print *, inval
+    print *, itest
+    print "(Z8.8)", itest
     
-    call mytable%get(key, value)
-    print *, 'value', value
+    print *, "----"
+    print *, val1
+    print *, SHA1(val1)
     
-    call mytable%get('jakesemail', outval)
-    print *, 'value', outval
-    
-    call mytable%dispose()
-        
+    print *, "----"
+    print *, val2
+    print *, SHA1(val2)
 end program datastructures
