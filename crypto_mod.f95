@@ -10,20 +10,23 @@ module crypto
     
 contains
     function SHA1(string)
-        character(len=*) :: string
+        character(len=*), intent(in) :: string
         character(len=40) :: SHA1
-        integer(int32) :: h0, h1, h2, h3, h4, w(80), a, b, c, d, e, f, k, temp
-        integer(int64) :: sl
+        
+        integer(int32) :: h0, h1, h2, h3, h4, a, b, c, d, e, f, k, temp
+        integer(int32), dimension(80) :: w
+        integer(int64) :: length
         integer(int8), dimension(:), allocatable :: ipadded
         integer :: i, j
         
-        sl = len_trim(string)
+        length = len_trim(string) ! TODO : support string lengths possible with uint64
         
-        allocate(ipadded(((sl+8)/64 + 1)*64))
-        ipadded(:sl) = transfer(string(:sl), ipadded(:sl))
-        ipadded(sl+1) = ibset(0_int8, 7)
-        ipadded(sl+2:) = 0_int8
-        ipadded(size(ipadded)-7:) = bytearray_reverse(transfer(sl*8_int64, ipadded(size(ipadded)-7:)))
+        allocate(ipadded(((length+8)/64 + 1)*64))
+        ipadded(:length) = transfer(string, ipadded(:length))
+        ipadded(length+1) = ibset(0_int8, 7)
+        ipadded(length+2:) = 0_int8
+        ipadded(size(ipadded)-7:) = transfer(length*8_int64, ipadded(size(ipadded)-7:))
+        ipadded(size(ipadded)-7:) = ipadded(size(ipadded):size(ipadded)-7:-1)
         
         h0 = 1732584193_int32 ! z'67452301'
         h1 = -271733879_int32 ! z'EFCDAB89'
@@ -73,30 +76,10 @@ contains
         
         deallocate(ipadded)
         
-        write(SHA1(1:8), "(Z8.8)") int32_reversebytes(h0)
-        write(SHA1(9:16), "(Z8.8)") int32_reversebytes(h1)
-        write(SHA1(17:24), "(Z8.8)") int32_reversebytes(h2)
-        write(SHA1(25:32), "(Z8.8)") int32_reversebytes(h3)
-        write(SHA1(33:40), "(Z8.8)") int32_reversebytes(h4)
+        write(SHA1(1:8), "(Z8.8)") h0
+        write(SHA1(9:16), "(Z8.8)") h1
+        write(SHA1(17:24), "(Z8.8)") h2
+        write(SHA1(25:32), "(Z8.8)") h3
+        write(SHA1(33:40), "(Z8.8)") h4
     end function SHA1
-    
-    
-    function int32_reversebytes(a)
-        integer(int32) :: a, int32_reversebytes, i
-        integer(int8), dimension(4) :: bytes, newbytes
-        
-        bytes = transfer(a, bytes)
-        do i = 1,4
-            newbytes(i) = bytes(4-i+1)
-        end do
-        int32_reversebytes = transfer(newbytes, int32_reversebytes)
-    end function int32_reversebytes
-    
-    
-    function bytearray_reverse(a) ! Most definitely unnecessary
-        integer(int8), dimension(:) :: a
-        integer(int8), dimension(size(a)) :: bytearray_reverse
-        
-        bytearray_reverse = a(size(a):1:-1)
-    end function bytearray_reverse
 end module crypto
