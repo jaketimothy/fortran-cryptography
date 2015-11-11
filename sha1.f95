@@ -1,7 +1,7 @@
 ! Notes:
 ! No, fortran does not support unsigned integers.
 
-module crypto
+module sha1Module
     use, intrinsic :: iso_fortran_env
     implicit none
     private
@@ -199,4 +199,4 @@ module crypto
         write(SHA1Hash(25:32), "(Z8.8)") h3
         write(SHA1Hash(33:40), "(Z8.8)") h4
     end function SHA1Hash
-end module crypto
+end module sha1Module

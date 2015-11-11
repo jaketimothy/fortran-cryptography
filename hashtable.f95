@@ -3,8 +3,8 @@
 ! Associative array implementation is used.  Therefor, old entries will be overwritten for new values.
 ! Currently no method is offered for deleting specific entries.
 
-module hashtable_mod
-    use crypto
+module hashtableModule
+    use sha1Module
     implicit none
     private
     
@@ -299,4 +299,4 @@ contains
         end if
         if (allocated(this%value)) deallocate(this%value)
     end subroutine hashnode_clear
-end module hashtable_mod
+end module hashtableModule
